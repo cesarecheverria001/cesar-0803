@@ -1,8 +1,8 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { registerUser } from '../../services/auth.service';
 
-import { saveUser } from '../../services/storage.service';
-import type { User } from '../../types/user';
 
 function Register() {
   const navigate = useNavigate();
@@ -43,16 +43,11 @@ function Register() {
       setError('Las contraseñas no coinciden.');
       return;
     }
-
-    const user: User = {
-      id: crypto.randomUUID(),
-      fullName: fullName.trim(),
-      email: email.trim().toLowerCase(),
-      password,
-      balance: 0,
-    };
-
-    saveUser(user);
+registerUser({
+  fullName,
+  email,
+  password,
+});
 
     navigate('/login');
   };

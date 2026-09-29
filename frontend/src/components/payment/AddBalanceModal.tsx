@@ -1,4 +1,5 @@
-import { FormEvent, useState } from "react";
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 
 import { getUser, updateUser } from "../../services/storage.service";
 
@@ -24,6 +25,17 @@ function AddBalanceModal({ onClose, onBalanceUpdated }: AddBalanceModalProps) {
 
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
+  const isValidCardNumber = (value: string): boolean => {
+    return /^\d{16}$/.test(value);
+  };
+
+  const isValidExpirationDate = (value: string): boolean => {
+    return /^(0[1-9]|1[0-2])\/\d{2}$/.test(value);
+  };
+
+  const isValidCvv = (value: string): boolean => {
+    return /^\d{3}$/.test(value);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,23 +44,41 @@ function AddBalanceModal({ onClose, onBalanceUpdated }: AddBalanceModalProps) {
     setMessageType("");
 
     const numericAmount = Number(amount);
+    if (!isValidCardNumber(cardNumber)) {
+      setMessage("El número de tarjeta debe contener exactamente 16 dígitos.");
+      setMessageType("error");
+      return;
+    }
+
+    if (!isValidExpirationDate(expirationDate)) {
+      setMessage("El vencimiento debe tener el formato MM/YY.");
+      setMessageType("error");
+      return;
+    }
+
+    if (!isValidCvv(cvv)) {
+      setMessage("El CVV debe contener exactamente 3 dígitos.");
+      setMessageType("error");
+      return;
+    }
+
+    if (!fullName.trim()) {
+      setMessage("Ingresa el nombre completo.");
+      setMessageType("error");
+      return;
+    }
+
+    if (numericAmount <= 0 || !Number.isFinite(numericAmount)) {
+      setMessage("Ingresa un monto válido mayor a cero.");
+      setMessageType("error");
+      return;
+    }
 
     /*
      * Verificar que exista un usuario.
      */
     if (!user) {
       setMessage("No existe una sesión de usuario.");
-
-      setMessageType("error");
-
-      return;
-    }
-
-    /*
-     * Validar monto.
-     */
-    if (numericAmount <= 0 || !Number.isFinite(numericAmount)) {
-      setMessage("Ingresa un monto válido mayor a cero.");
 
       setMessageType("error");
 

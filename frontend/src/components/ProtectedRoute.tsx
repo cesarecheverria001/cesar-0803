@@ -1,11 +1,10 @@
 import { Navigate, Outlet } from 'react-router-dom';
-
-import { hasActiveSession } from '../services/storage.service';
+import { isAuthenticated } from '../services/auth.service';
 
 function ProtectedRoute() {
-  const isAuthenticated = hasActiveSession();
+  const authenticated = isAuthenticated();
 
-  if (!isAuthenticated) {
+  if (!authenticated) {
     return <Navigate to="/login" replace />;
   }
 

@@ -1,66 +1,46 @@
-import { FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 
-import {
-  createSession,
-  getUser,
-} from '../../services/storage.service';
+import { loginUser } from "../../services/auth.service";
 
 function Login() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setError('');
+    setError("");
 
     if (!email.trim() || !password) {
-      setError('Ingresa tu correo y contraseña.');
+      setError("Ingresa tu correo y contraseña.");
       return;
     }
 
-    const user = getUser();
+    const authenticated = loginUser(email, password);
 
-    if (!user) {
-      setError('No existe un usuario registrado.');
+    if (!authenticated) {
+      setError("Correo o contraseña incorrectos.");
       return;
     }
 
-    if (
-      user.email !== email.trim().toLowerCase() ||
-      user.password !== password
-    ) {
-      setError('El correo o la contraseña son incorrectos.');
-      return;
-    }
-
-    createSession();
-
-    navigate('/dashboard');
+    navigate("/dashboard");
   };
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-12">
       <div className="mx-auto flex min-h-[80vh] max-w-md items-center justify-center">
-
         <section className="w-full rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
-
           <div className="mb-8 text-center">
-            <div className="mb-4 text-6xl">
-              🐌
-            </div>
+            <div className="mb-4 text-6xl">🐌</div>
 
-            <h1 className="text-3xl font-bold text-white">
-              Bienvenido
-            </h1>
+            <h1 className="text-3xl font-bold text-white">Bienvenido</h1>
 
-            <p className="mt-2 text-slate-400">
-              Inicia sesión en Snail Race
-            </p>
+            <p className="mt-2 text-slate-400">Inicia sesión en Snail Race</p>
           </div>
 
           {error && (
@@ -70,7 +50,6 @@ function Login() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
             <div>
               <label
                 htmlFor="email"
@@ -113,11 +92,10 @@ function Login() {
             >
               Iniciar sesión
             </button>
-
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-400">
-            ¿No tienes una cuenta?{' '}
+            ¿No tienes una cuenta?{" "}
             <Link
               to="/register"
               className="font-semibold text-indigo-400 hover:text-indigo-300"
@@ -125,9 +103,7 @@ function Login() {
               Crear cuenta
             </Link>
           </p>
-
         </section>
-
       </div>
     </main>
   );
